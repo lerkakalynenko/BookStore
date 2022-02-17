@@ -8,7 +8,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using BookStore.Domain.Interfaces;
+using BookStore.Infrastructure.Business;
 using BookStore.Infrastructure.Data;
+using BookStore.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
@@ -32,6 +36,17 @@ namespace BookStore
 
             services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(connection));
 
+
+            services.AddTransient<IBookRepository, BookRepository>();
+            services.AddTransient<IBookService, BookService>();
+
+            services.AddTransient<IOrderRepository, OrderRepository>();
+            services.AddTransient<IOrderService, OrderService>();
+
+            services.AddTransient<ICategoryRepository, CategoryRepository>();
+            services.AddTransient<ICategoryService, CategoryService>();
+
+
             services.AddAuthorization();
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
@@ -40,9 +55,12 @@ namespace BookStore
                 });
 
             services.AddControllersWithViews();
+
+            
+
         }
 
-       
+
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())

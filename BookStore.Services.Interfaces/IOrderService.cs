@@ -9,10 +9,10 @@ namespace BookStore.Services.Interfaces
 {
     public interface IOrderService
     {
-        public Order Create(Order order);
-        public Order GetById(int id);
-        public void Delete(int id);
-        public void Update(Order order);
-        public ICollection<Order> GetAll();
+         Order Create(Order order);
+         Order GetById(int id);
+         void Delete(int id);
+         void Update(Order order);
+         ICollection<Order> GetAll();
     }
 }

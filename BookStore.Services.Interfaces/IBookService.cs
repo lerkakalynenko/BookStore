@@ -14,7 +14,7 @@ namespace BookStore.Services.Interfaces
          void Update(Book book);
          void Delete(int id);
          IEnumerable<Book> GetAll();
-         IEnumerable<Book> RangeByCategory(Category category);
-         IEnumerable<Book> RangeByPrice();
+         //IEnumerable<Book> RangeByCategory(Category category);
+         //IEnumerable<Book> RangeByPrice();
     }
 }

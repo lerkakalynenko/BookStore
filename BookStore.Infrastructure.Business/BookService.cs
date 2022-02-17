@@ -17,12 +17,11 @@ namespace BookStore.Infrastructure.Business
     {
         private readonly IBookRepository repository;
         private readonly ICategoryRepository categoryRepository;
-        private readonly Book book;
-        public BookService(IBookRepository repository, ICategoryRepository categoryRepository, Book book)
+       
+        public BookService(IBookRepository repository, ICategoryRepository categoryRepository )
         {
             this.repository = repository;
             this.categoryRepository = categoryRepository;
-            this.book = book;
         }
 
         public Book Create(Book book)
@@ -50,17 +49,6 @@ namespace BookStore.Infrastructure.Business
             return repository.GetAll();
         }
 
-        public IEnumerable<Book> RangeByCategory(Category category)
-        {
-            throw new NotImplementedException();
-        }
-
-       
-        //TODO
-        public IEnumerable<Book> RangeByPrice()
-        {
-            return repository.GetAll()
-                ;
-        }
+      
     }
 }

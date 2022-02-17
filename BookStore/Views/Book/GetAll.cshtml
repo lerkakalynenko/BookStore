@@ -1,0 +1,9 @@
+﻿
+@model IEnumerable<BookStore.Domain.Core.Entities.Book>
+
+@foreach (var book in @Model)
+{
+    <h1 >Name: @book.BookName</h1>
+    <h1>Price: @book.Price</h1>  
+    <h1>Description: @book.Description</h1>
+}

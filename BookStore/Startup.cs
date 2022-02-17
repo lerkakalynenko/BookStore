@@ -37,14 +37,14 @@ namespace BookStore
             services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(connection));
 
 
-            services.AddTransient<IBookRepository, BookRepository>();
-            services.AddTransient<IBookService, BookService>();
+            services.AddScoped<IBookRepository, BookRepository>();
+            services.AddScoped<IBookService, BookService>();
 
-            services.AddTransient<IOrderRepository, OrderRepository>();
-            services.AddTransient<IOrderService, OrderService>();
+            services.AddScoped<IOrderRepository, OrderRepository>();
+            services.AddScoped<IOrderService, OrderService>();
 
-            services.AddTransient<ICategoryRepository, CategoryRepository>();
-            services.AddTransient<ICategoryService, CategoryService>();
+            services.AddScoped<ICategoryRepository, CategoryRepository>();
+            services.AddScoped<ICategoryService, CategoryService>();
 
 
             services.AddAuthorization();

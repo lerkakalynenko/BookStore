@@ -9,8 +9,8 @@ namespace BookStore.Domain.Core.Entities
     public class Order
     {
         public int Id { get; set; }
-        public int UserId { get; set; }
-        public Book BookId { get; set; }
+        public User User { get; set; }
+        public Book Book { get; set; }
         public int Quantity { get; set; }
     }
 }

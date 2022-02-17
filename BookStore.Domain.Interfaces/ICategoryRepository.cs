@@ -9,10 +9,10 @@ namespace BookStore.Domain.Interfaces
 {
     public interface ICategoryRepository
     {
-        public Category Create(Category category);
-        public Category GetById(int id);
-        public void Update(Category category);
-        public void Delete(int id);
-        public IEnumerable<Category> GetAll();
+         Category Create(Category category);
+         Category GetById(int id);
+         void Update(Category category);
+         void Delete(int id);
+         IEnumerable<Category> GetAll();
     }
 }

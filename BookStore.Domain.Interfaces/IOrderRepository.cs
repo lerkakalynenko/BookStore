@@ -9,10 +9,10 @@ namespace BookStore.Domain.Interfaces
 {
     public interface IOrderRepository
     {
-        public Order Create(Order order);
-        public Order GetById(int id);
-        public void Delete(int id);
-        public void Update(Order order);
-        public ICollection<Order> GetAll();
+         Order Create(Order order);
+         Order GetById(int id);
+         void Delete(int id);
+         void Update(Order order);
+         ICollection<Order> GetAll();
     }
 }

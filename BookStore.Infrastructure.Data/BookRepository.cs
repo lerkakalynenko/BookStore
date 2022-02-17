@@ -13,10 +13,12 @@ namespace BookStore.Infrastructure.Data
     {
         private readonly ApplicationContext context;
         private readonly DbSet<Book> dbSet;
+        private readonly ICategoryRepository categoryRepository;
 
-        public BookRepository(ApplicationContext context)
+        public BookRepository(ApplicationContext context, ICategoryRepository categoryRepository)
         {
             this.context = context;
+            this.categoryRepository = categoryRepository;
             context.Database.EnsureCreated();
             dbSet = context.Set<Book>();
         }
@@ -53,5 +55,7 @@ namespace BookStore.Infrastructure.Data
         {
             return dbSet.ToList();
         }
+
+        
     }
 }

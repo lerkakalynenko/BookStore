@@ -9,11 +9,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using BookStore.Domain.Core;
+using BookStore.Domain.Core.Entities;
 using BookStore.Domain.Interfaces;
 using BookStore.Infrastructure.Business;
 using BookStore.Infrastructure.Data;
 using BookStore.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -36,7 +39,9 @@ namespace BookStore
 
             services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(connection));
 
-
+            services.AddIdentity<User, IdentityRole>()
+                .AddRoles<IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationContext>();
             services.AddScoped<IBookRepository, BookRepository>();
             services.AddScoped<IBookService, BookService>();
 
@@ -46,6 +51,7 @@ namespace BookStore
             services.AddScoped<ICategoryRepository, CategoryRepository>();
             services.AddScoped<ICategoryService, CategoryService>();
 
+           // services.AddScoped<UserManager<User>>();
 
             services.AddAuthorization();
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -56,7 +62,28 @@ namespace BookStore
 
             services.AddControllersWithViews();
 
-            
+            services.Configure<IdentityOptions>(options =>
+            {
+                // Password settings.
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequiredLength = 5;
+                options.Password.RequiredUniqueChars = 1;
+
+                // Lockout settings.
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+                options.Lockout.MaxFailedAccessAttempts = 5;
+                options.Lockout.AllowedForNewUsers = true;
+
+
+                // User settings.
+                options.User.AllowedUserNameCharacters =
+                    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+ ";
+                options.User.RequireUniqueEmail = true;
+            });
+
 
         }
 

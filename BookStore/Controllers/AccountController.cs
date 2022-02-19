@@ -1,12 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Security.Claims;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using BookStore.Domain.Core;
 using BookStore.Domain.Core.Entities;
-using BookStore.Infrastructure.Data;
 using BookStore.Models;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using BookStore.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.Web;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -14,35 +15,18 @@ namespace BookStore.Controllers
 {
     public class AccountController : Controller
     {
-        private ApplicationContext db;
+        private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> _signInManager;
 
-        public AccountController(ApplicationContext context)
+
+
+        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager)
         {
-            db = context;
+            _userManager = userManager;
+            _signInManager = signInManager;
+
         }
 
-        [HttpGet]
-        public IActionResult Login()
-        {
-            return View();
-        }
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                User user = await db.Users.FirstOrDefaultAsync(u => u.Email == model.Email && u.Password == model.Password);
-                if (user != null)
-                {
-                    await Authenticate(model.Email); // аутентификация
-
-                    return RedirectToAction("Index", "Home");
-                }
-                ModelState.AddModelError("", "Некорректные логин и(или) пароль");
-            }
-            return View(model);
-        }
         [HttpGet]
         public IActionResult Register()
         {
@@ -50,46 +34,124 @@ namespace BookStore.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterModel model)
         {
             if (ModelState.IsValid)
             {
-                User user = await db.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
-                if (user == null)
+                User user = new User
                 {
-                    // добавляем пользователя в бд
-                    db.Users.Add(new User {Name = model.Name, Surname = model.Surname, Number = model.Number,
-                        Email = model.Email, Password = model.Password});
-                    await db.SaveChangesAsync();
+                    Name = model.Name, Surname = model.Surname, PhoneNumber = model.Number, Email = model.Email,
+                    UserName = model.Email
 
-                    await Authenticate(model.Email); // аутентификация
+                };
 
+                var result = await _userManager.CreateAsync(user, model.Password);
+                if (result.Succeeded)
+                {
+
+                    await _signInManager.SignInAsync(user, false);
                     return RedirectToAction("Index", "Home");
                 }
                 else
-                    ModelState.AddModelError("", "Некорректные логин и(или) пароль");
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+                }
             }
+
             return View(model);
         }
 
-        private async Task Authenticate(string userName)
+        [HttpGet]
+        public ViewResult Login()
         {
-            // создаем один claim
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimsIdentity.DefaultNameClaimType, userName)
-            };
-            // создаем объект ClaimsIdentity
-            ClaimsIdentity id = new ClaimsIdentity(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
-            // установка аутентификационных куки
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(id));
+            return View();
         }
 
-        public async Task<IActionResult> Logout()
+        [HttpPost]
+        public async Task<ActionResult> Login(LoginModel model)
         {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return RedirectToAction("Login", "Account");
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
+
+            var result = await _signInManager
+                .PasswordSignInAsync(model.Email, model.Password, true, false);
+
+            if (result.Succeeded)
+            {
+                return RedirectToAction("Profile", "Account");
+            }
+            else
+            {
+
+
+                ModelState.AddModelError(string.Empty, "Incorrect login or password.");
+
+            }
+
+            return View();
         }
-    }
+
+        [HttpGet]
+        public async Task<ActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+            return RedirectToAction("Index", "Home");
+        }
+
+
+        [HttpGet]
+        [Authorize]
+        public async Task<ActionResult> Profile()
+        {
+
+            return View(await _userManager.FindByNameAsync(User.Identity.Name));
+
+        }
+
+        [HttpGet]
+        [Authorize]
+        public async Task<ActionResult> Edit()
+        {
+            return View(await _userManager.FindByNameAsync(User.Identity.Name));
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<ActionResult> Edit(EditViewModel model)
+        {
+            User user = await _userManager.FindByNameAsync(User.Identity.Name);
+
+            user.Name = model.Name;
+            user.Surname = model.Surname;
+            user.PhoneNumber = model.Number; 
+            //user.Email = model.Email;
+
+            var result = await _userManager.UpdateAsync(user);
+            if (result.Succeeded)
+            {
+                await _userManager.UpdateAsync(user);
+                return RedirectToAction("Profile", "Account");
+            }
+            else
+            {
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+
+                //return View(await _userManager.FindByNameAsync(User.Identity.Name));
+            }
+
+
+            return RedirectToAction("Profile", "Account");
+
+        }
+    
+}
+
 }

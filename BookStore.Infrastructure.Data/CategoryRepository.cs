@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BookStore.Domain.Core;
 using BookStore.Domain.Core.Entities;
 using BookStore.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;

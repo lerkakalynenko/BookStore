@@ -1,21 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BookStore.Domain.Core.Entities;
+﻿using BookStore.Domain.Core.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace BookStore.Infrastructure.Data
+namespace BookStore.Domain.Core
 {
     public class ApplicationContext : IdentityDbContext<IdentityUser>
     {
         public DbSet<Category> Categories { get; set; }
         public DbSet<Book> Books { get; set; }
         public DbSet<Order> Orders { get; set; }
-        public DbSet<User> Users { get; set; }
+        public DbSet<User> Clients{ get; set; }
         public ApplicationContext()
         {
 

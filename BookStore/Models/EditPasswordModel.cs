@@ -6,13 +6,11 @@ using System.Threading.Tasks;
 
 namespace BookStore.Models
 {
-    public class EditViewModel
+    public class EditPasswordModel
     {
         public string Id { get; set; }
-        public string Name { get; set; }
-        public string Surname { get; set; }
-        public string PhoneNumber { get; set; }
         public string Email { get; set; }
-       
+        public string OldPassword { get; set; }
+        public string NewPassword { get; set; }
     }
 }

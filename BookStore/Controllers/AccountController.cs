@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using BookStore.Domain.Core;
 using BookStore.Domain.Core.Entities;
 using BookStore.Models;
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Web;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 
 
 namespace BookStore.Controllers
@@ -117,19 +119,27 @@ namespace BookStore.Controllers
         [Authorize]
         public async Task<ActionResult> Edit()
         {
-            return View(await _userManager.FindByNameAsync(User.Identity.Name));
+            User user = await _userManager.FindByNameAsync(User.Identity.Name);
+            var model = new EditViewModel
+            {
+                Name = user.Name, Surname = user.Surname,
+                PhoneNumber = user.PhoneNumber, Email = user.Email
+            };
+            return View(model);
         }
 
         [HttpPost]
         [Authorize]
         public async Task<ActionResult> Edit(EditViewModel model)
         {
+
             User user = await _userManager.FindByNameAsync(User.Identity.Name);
+
 
             user.Name = model.Name;
             user.Surname = model.Surname;
-            user.PhoneNumber = model.Number; 
-            //user.Email = model.Email;
+            user.PhoneNumber = model.PhoneNumber;
+            user.Email = model.Email;
 
             var result = await _userManager.UpdateAsync(user);
             if (result.Succeeded)
@@ -142,11 +152,55 @@ namespace BookStore.Controllers
                 foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
+                    return View(model);
                 }
 
                 //return View(await _userManager.FindByNameAsync(User.Identity.Name));
             }
 
+
+            return RedirectToAction("Profile", "Account");
+
+        }
+
+        [HttpGet]
+        [Authorize]
+        public async Task<ActionResult> EditPassword()
+        {
+            User user = await _userManager.FindByNameAsync(User.Identity.Name);
+            var model = new EditPasswordModel()
+            {
+                Email = user.Email
+            };
+            return View(model);
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<ActionResult> EditPassword(EditPasswordModel model)
+        {
+
+            User user = await _userManager.FindByNameAsync(User.Identity.Name);
+            if (user != null)
+            {
+                IdentityResult result =
+                    await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
+                if (result.Succeeded)
+                {
+                    await Logout();
+                    
+                    return RedirectToAction("Login");
+
+                }
+                else
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                        return View(model);
+                    }
+                }
+            }
 
             return RedirectToAction("Profile", "Account");
 

@@ -1,4 +1,4 @@
-﻿@model BookStore.Domain.Core.Entities.User
+﻿@model EditViewModel
 
 
 @{
@@ -8,22 +8,24 @@
     <div asp-validation-summary="All" class="text-danger"></div>
     
     <div class="form-group">
+        <input type="hidden" asp-for="Id" />
         <label asp-for="Name" class="control-label">Name</label>
-        <input type="text" asp-for="Name" class="form-control" />
+        <input required type="text" asp-for="Name" class="form-control" />
     </div>
     <div class="form-group">
         <label asp-for="Surname" class="control-label">Surname</label>
-        <input type="text" asp-for="Surname" class="form-control" />
+        <input required  type="text" asp-for="Surname" class="form-control" />
     </div>
     <div class="form-group">
         <label asp-for="PhoneNumber" class="control-label">Number</label>
-        <input type="text" asp-for="PhoneNumber" class="form-control" />
+        <input required min="10" type="text" asp-for="PhoneNumber" class="form-control" />
     </div>
-    @*<div class="form-group">
-        <label asp-for="Email" class="control-label">Your Email</label>
-        <input type="email" asp-for="Email" class="form-control" />
-    </div>*@
     <div class="form-group">
-        <input type="submit" value="Save" asp-route-model="EditViewModel" class="btn btn-outline-secondary" />
+        <label asp-for="Email" class="control-label">Your Email</label>
+        <input required="" type="email" asp-for="Email" class="form-control" />
+    </div>
+   
+    <div class="form-group">
+        <input type="submit" value="Save"  class="btn btn-outline-secondary" />
     </div>
 </form>
